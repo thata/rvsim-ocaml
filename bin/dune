@@ -1,0 +1,4 @@
+(executable
+ (public_name rvsim)
+ (name main)
+ (libraries rvsim))

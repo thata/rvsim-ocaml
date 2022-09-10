@@ -1,0 +1,3 @@
+(test
+ (name memory_test) ; 追加したテストのファイル名（.mlは省略）
+ (libraries rvsim)) ; Rvsim.Memoryを参照できるよう、ライブラリにrvsimを追加
