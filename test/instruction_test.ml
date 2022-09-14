@@ -1,24 +1,61 @@
-let () = print_endline "Hi"
+(* R形式 *)
+let _ =
+  let word = 0b1000001_10111_10011_101_10001_0110011_l in
+  let inst = Rvsim.Instruction.decode word in
+  Printf.printf "%d\n" inst.opcode;
+  (* => 51 *)
+  Printf.printf "%d\n" inst.rd;
+  (* => 17 *)
+  Printf.printf "%d\n" inst.funct3;
+  (* => 5 *)
+  Printf.printf "%d\n" inst.rs1;
+  (* => 19 *)
+  Printf.printf "%d\n" inst.rs2;
+  (* => 23 *)
+  Printf.printf "%d\n" inst.funct7
+  (* => 65 *)
 
-(* メモリを初期化 *)
-let memory = Rvsim.Memory.of_string "\x93\x00\x01\x01\x94\x00\x01\x01"
+(* I形式 *)
+let _ =
+  let word = 0b100000000001_10011_101_10001_0010011_l in
+  let inst = Rvsim.Instruction.decode word in
+  Printf.printf "%d\n" inst.opcode;
+  (* => 19 *)
+  Printf.printf "%d\n" inst.rd;
+  (* => 17 *)
+  Printf.printf "%d\n" inst.funct3;
+  (* => 5 *)
+  Printf.printf "%d\n" inst.rs1;
+  (* => 19 *)
+  Printf.printf "%d\n" inst.i_imm
+  (* => 2049 *)
 
-(* アドレスを指定して読み込み *)
-let test = Rvsim.Memory.read_word memory 0
-let _ = Printf.printf "%08x\n" (Int32.to_int test)
-let test = Rvsim.Memory.read_word memory 4
-let _ = Printf.printf "%08x\n" (Int32.to_int test)
+(* S形式 *)
+let _ =
+  let word = 0b1000001_10111_10011_101_10001_0100011_l in
+  let inst = Rvsim.Instruction.decode word in
+  Printf.printf "%d\n" inst.opcode;
+  (* => 35 *)
+  Printf.printf "%d\n" inst.funct3;
+  (* => 5 *)
+  Printf.printf "%d\n" inst.rs1;
+  (* => 19 *)
+  Printf.printf "%d\n" inst.rs2;
+  (* => 23 *)
+  Printf.printf "%d\n" inst.s_imm
+  (* => 2097 *)
 
-(* アドレス0番地へ書き込み *)
-let test =
-  Rvsim.Memory.write_word memory 0 0x00ABCDEFl;
-  Rvsim.Memory.read_word memory 0
-
-let _ = Printf.printf "%08x\n" (Int32.to_int test)
-
-(* アドレス4番地へ書き込み *)
-let test =
-  Rvsim.Memory.write_word memory 4 (-1l);
-  Rvsim.Memory.read_word memory 4
-
-let _ = Printf.printf "%d\n" (Int32.to_int test)
+(* B形式 *)
+let _ =
+  let word = 0b1_100001_10111_10011_101_1001_1_1100011_l in
+  let inst = Rvsim.Instruction.decode word in
+  Printf.printf "%d\n" inst.opcode;
+  (* => 99 *)
+  Printf.printf "%d\n" inst.funct3;
+  (* => 5 *)
+  Printf.printf "%d\n" inst.rs1;
+  (* => 19 *)
+  Printf.printf "%d\n" inst.rs2;
+  (* => 23 *)
+  Printf.printf "%d\n" inst.b_imm
+  (* => 7218 *)
