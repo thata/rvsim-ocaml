@@ -70,9 +70,9 @@ let _or rd rs1 rs2 =
 
 (* ADDI命令 *)
 let addi rd rs1 rs2 =
-  let _op = 0b0110011
+  let _op = 0b0010011
   and _rd = rd lsl 7
-  and _f3 = 0b000
+  and _f3 = 0x0
   and _rs1 = rs1 lsl 15
   and _rs2 = rs2 lsl 20
   and _f7 = 0b0000000 in
@@ -80,12 +80,12 @@ let addi rd rs1 rs2 =
 
 (* SLLI命令 *)
 let slli rd rs1 rs2 =
-  let _op = 0b0110011
+  let _op = 0b0010011
   and _rd = rd lsl 7
-  and _f3 = 0b000
+  and _f3 = 0x1
   and _rs1 = rs1 lsl 15
   and _rs2 = rs2 lsl 20
-  and _f7 = 0b0000000 in
+  and _f7 = 0x00 in
   Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
 
 (* BEQ命令 *)
