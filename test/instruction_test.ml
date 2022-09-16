@@ -13,7 +13,7 @@ let _ =
   Printf.printf "%d\n" inst.rs2;
   (* => 23 *)
   Printf.printf "%d\n" inst.funct7
-  (* => 65 *)
+(* => 65 *)
 
 (* I形式 *)
 let _ =
@@ -28,7 +28,7 @@ let _ =
   Printf.printf "%d\n" inst.rs1;
   (* => 19 *)
   Printf.printf "%d\n" inst.i_imm
-  (* => 2049 *)
+(* => 2049 *)
 
 (* S形式 *)
 let _ =
@@ -43,7 +43,7 @@ let _ =
   Printf.printf "%d\n" inst.rs2;
   (* => 23 *)
   Printf.printf "%d\n" inst.s_imm
-  (* => 2097 *)
+(* => 2097 *)
 
 (* B形式 *)
 let _ =
@@ -58,4 +58,4 @@ let _ =
   Printf.printf "%d\n" inst.rs2;
   (* => 23 *)
   Printf.printf "%d\n" inst.b_imm
-  (* => 7218 *)
+(* => 7218 *)

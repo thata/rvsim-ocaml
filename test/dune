@@ -1,3 +1,3 @@
 (tests
- (names memory_test instruction_test)
+ (names memory_test instruction_test cpu_test)
  (libraries rvsim))
