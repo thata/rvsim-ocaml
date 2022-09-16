@@ -27,3 +27,93 @@ let decode word =
     lor ((wd land 0x00000f00) lsr 7)
   in
   { opcode; rd; funct3; rs1; rs2; funct7; i_imm; s_imm; b_imm }
+
+(* ADD命令 *)
+let add rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0x0
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0x00 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* SUB命令 *)
+let sub rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0x0
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0x20 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* AND命令 *)
+let _and rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0x7
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0x00 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* OR命令 *)
+let _or rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0x6
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* ADDI命令 *)
+let addi rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0b000
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* SLLI命令 *)
+let slli rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0b000
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* BEQ命令 *)
+let beq rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0b000
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* LW命令 *)
+let lw rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0b000
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
+
+(* SW命令 *)
+let sw rd rs1 rs2 =
+  let _op = 0b0110011
+  and _rd = rd lsl 7
+  and _f3 = 0b000
+  and _rs1 = rs1 lsl 15
+  and _rs2 = rs2 lsl 20
+  and _f7 = 0b0000000 in
+  Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)

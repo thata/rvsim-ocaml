@@ -26,6 +26,38 @@ let exec_sub cpu (inst : Instruction.t) =
   cpu.pc <- Int32.add cpu.pc 4l;
   Array.set cpu.x_registers inst.rd (Int32.sub v1 v2)
 
+(* OR命令 *)
+let exec_or cpu (inst : Instruction.t) =
+  let v1 = Int32.to_int (Array.get cpu.x_registers inst.rs1)
+  and v2 = Int32.to_int (Array.get cpu.x_registers inst.rs2) in
+  cpu.pc <- Int32.add cpu.pc 4l;
+  Array.set cpu.x_registers inst.rd (Int32.of_int (v1 lor v2))
+
+(* AND命令 *)
+let exec_and cpu (inst : Instruction.t) =
+  let v1 = Int32.to_int (Array.get cpu.x_registers inst.rs1)
+  and v2 = Int32.to_int (Array.get cpu.x_registers inst.rs2) in
+  cpu.pc <- Int32.add cpu.pc 4l;
+  Array.set cpu.x_registers inst.rd (Int32.of_int (v1 land v2))
+
+let exec_addi cpu (inst : Instruction.t) =
+  let v1 = Array.get cpu.x_registers inst.rs1
+  (* TODO: i_imm の符号拡張が必要 *)
+  and imm = Int32.of_int inst.i_imm in
+  cpu.pc <- Int32.add cpu.pc 4l;
+  Array.set cpu.x_registers inst.rd (Int32.add v1 imm)
+
+let exec_slli cpu (inst : Instruction.t) =
+  let v1 = Array.get cpu.x_registers inst.rs1
+  (* TODO: i_imm の符号拡張が必要 *)
+  and imm = inst.i_imm in
+  cpu.pc <- Int32.add cpu.pc 4l;
+  Array.set cpu.x_registers inst.rd (Int32.shift_left v1 imm)
+
+let exec_beq _ _ = ()
+let exec_lw _ _ = ()
+let exec_sw _ _ = ()
+
 let fetch cpu =
   let word = Memory.read_word cpu.memory (Int32.to_int cpu.pc) in
   Instruction.decode word
@@ -34,6 +66,13 @@ let exec cpu (inst : Instruction.t) =
   match inst with
   | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x00; _ } -> exec_add cpu inst
   | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; _ } -> exec_sub cpu inst
+  | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; _ } -> exec_or cpu inst
+  | { opcode = 0b0110011; funct3 = 0x7; funct7 = 0x00; _ } -> exec_and cpu inst
+  | { opcode = 0b0010011; funct3 = 0x0; _ } -> exec_addi cpu inst
+  | { opcode = 0b0010011; funct3 = 0x1; _ } -> exec_slli cpu inst
+  | { opcode = 0b1100011; funct3 = 0x0; _ } -> exec_beq cpu inst
+  | { opcode = 0b0000011; funct3 = 0x2; _ } -> exec_lw cpu inst
+  | { opcode = 0b0100011; funct3 = 0x2; _ } -> exec_sw cpu inst
   | _ -> failwith "invalid instruction"
 
 let run cpu = exec cpu (fetch cpu)

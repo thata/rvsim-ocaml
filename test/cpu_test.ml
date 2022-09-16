@@ -11,8 +11,8 @@ let _add rd rs1 rs2 =
 let print_int32 i = print_int (Int32.to_int i)
 let cpu = Rvsim.Cpu.create
 
-(* 簡単な命令を実行してみる *)
-let _ =
+(* 簡単な実行のテスト *)
+let test_run () =
   let data =
     let data = Bytes.create 8 in
     Bytes.set_int32_le data 0 (_add 4 1 2);
@@ -31,34 +31,37 @@ let _ =
   Rvsim.Cpu.init_memory cpu data;
   (* 実行前 *)
   print_int32 cpu.pc;
-  print_newline ();
   (* => 0 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 1);
-  print_newline ();
   (* => 10 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 2);
-  print_newline ();
   (* => 20 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 3);
-  print_newline ();
   (* => 30 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 4);
-  print_newline ();
   (* => 0 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 5);
-  print_newline ();
   (* => 0 *)
-  Rvsim.Cpu.run cpu;
+  print_newline ();
   (* 1つめの命令を実行 *)
   Rvsim.Cpu.run cpu;
   (* 2つめの命令を実行 *)
+  Rvsim.Cpu.run cpu;
   (* 実行後 *)
   print_int32 cpu.pc;
-  print_newline ();
   (* => 8 *)
-  print_int32 (Array.get cpu.x_registers 4);
   print_newline ();
+  print_int32 (Array.get cpu.x_registers 4);
   (* => 30 *)
+  print_newline ();
   print_int32 (Array.get cpu.x_registers 5);
+  (* => 60 *)
   print_newline ()
-(* => 60 *)
+
+let _ =
+  test_run ()
