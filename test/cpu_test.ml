@@ -9,7 +9,6 @@ let _add rd rs1 rs2 =
   Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
 
 let print_int32 i = print_int (Int32.to_int i)
-let cpu = Rvsim.Cpu.create
 
 (* 簡単な実行のテスト *)
 let test_run () =
@@ -21,6 +20,7 @@ let test_run () =
     (* x5 = x4 + x3 *)
     data
   in
+  let cpu = Rvsim.Cpu.create in
   (* 初期化 *)
   Array.set cpu.x_registers 1 10l;
   (* x1 = 10 *)
@@ -63,5 +63,43 @@ let test_run () =
   (* => 60 *)
   print_newline ()
 
+let test_exec_add () =
+  let cpu = Rvsim.Cpu.create in
+  Array.set cpu.x_registers 1 10l;
+  (* x1 = 10 *)
+  Array.set cpu.x_registers 2 20l;
+  (* x2 = 20 *)
+  Array.set cpu.x_registers 3 (-10l);
+  (* x3 = -10 *)
+  Rvsim.Cpu.exec_add cpu 4 1 2;
+  print_int32 (Array.get cpu.x_registers 4);
+  (* => 30 *)
+  print_newline ();
+  Rvsim.Cpu.exec_add cpu 5 0 3;
+  (* x5 = x0 + x3 *)
+  print_int32 (Array.get cpu.x_registers 5);
+  (* => -10 *)
+  print_newline ()
+
+let test_exec_sub () =
+  let cpu = Rvsim.Cpu.create in
+  Array.set cpu.x_registers 1 10l;
+  (* x1 = 10 *)
+  Array.set cpu.x_registers 2 20l;
+  (* x2 = 20 *)
+  Array.set cpu.x_registers 3 (-10l);
+  (* x3 = -10 *)
+  Rvsim.Cpu.exec_sub cpu 4 2 1; (* x4 = x2 - x1 *)
+  print_int32 (Array.get cpu.x_registers 4);
+  (* => 10 *)
+  print_newline ();
+  Rvsim.Cpu.exec_sub cpu 5 2 3;
+  (* x5 = x2 - x3 *)
+  print_int32 (Array.get cpu.x_registers 5);
+  (* => 30 *)
+  print_newline ()
+
 let _ =
-  test_run ()
+  test_run ();
+  test_exec_add ();
+  test_exec_sub ()

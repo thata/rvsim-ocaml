@@ -13,18 +13,18 @@ let set_x_register cpu n v = if n = 0 then () else Array.set cpu.x_registers n v
 let init_memory cpu data = Memory.init cpu.memory data
 
 (* ADD命令 *)
-let exec_add cpu (inst : Instruction.t) =
-  let v1 = Array.get cpu.x_registers inst.rs1
-  and v2 = Array.get cpu.x_registers inst.rs2 in
+let exec_add cpu rd rs1 rs2 =
+  let v1 = Array.get cpu.x_registers rs1
+  and v2 = Array.get cpu.x_registers rs2 in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.add v1 v2)
+  Array.set cpu.x_registers rd (Int32.add v1 v2)
 
 (* SUB命令 *)
-let exec_sub cpu (inst : Instruction.t) =
-  let v1 = Array.get cpu.x_registers inst.rs1
-  and v2 = Array.get cpu.x_registers inst.rs2 in
+let exec_sub cpu rd rs1 rs2 =
+  let v1 = Array.get cpu.x_registers rs1
+  and v2 = Array.get cpu.x_registers rs2 in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.sub v1 v2)
+  Array.set cpu.x_registers rd (Int32.sub v1 v2)
 
 (* OR命令 *)
 let exec_or cpu (inst : Instruction.t) =
@@ -64,8 +64,10 @@ let fetch cpu =
 
 let exec cpu (inst : Instruction.t) =
   match inst with
-  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x00; _ } -> exec_add cpu inst
-  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; _ } -> exec_sub cpu inst
+  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x00; rd; rs1; rs2; _ } ->
+      exec_add cpu rd rs1 rs2
+  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; rd; rs1; rs2; _ } ->
+      exec_sub cpu rd rs1 rs2
   | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; _ } -> exec_or cpu inst
   | { opcode = 0b0110011; funct3 = 0x7; funct7 = 0x00; _ } -> exec_and cpu inst
   | { opcode = 0b0010011; funct3 = 0x0; _ } -> exec_addi cpu inst
