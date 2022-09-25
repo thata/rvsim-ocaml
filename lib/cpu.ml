@@ -27,11 +27,11 @@ let exec_sub cpu rd rs1 rs2 =
   Array.set cpu.x_registers rd (Int32.sub v1 v2)
 
 (* OR命令 *)
-let exec_or cpu (inst : Instruction.t) =
-  let v1 = Int32.to_int (Array.get cpu.x_registers inst.rs1)
-  and v2 = Int32.to_int (Array.get cpu.x_registers inst.rs2) in
+let exec_or cpu rd rs1 rs2 =
+  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
+  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.of_int (v1 lor v2))
+  Array.set cpu.x_registers rd (Int32.of_int (v1 lor v2))
 
 (* AND命令 *)
 let exec_and cpu (inst : Instruction.t) =
@@ -68,7 +68,8 @@ let exec cpu (inst : Instruction.t) =
       exec_add cpu rd rs1 rs2
   | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; rd; rs1; rs2; _ } ->
       exec_sub cpu rd rs1 rs2
-  | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; _ } -> exec_or cpu inst
+  | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; rd; rs1; rs2; _ } ->
+      exec_or cpu rd rs1 rs2
   | { opcode = 0b0110011; funct3 = 0x7; funct7 = 0x00; _ } -> exec_and cpu inst
   | { opcode = 0b0010011; funct3 = 0x0; _ } -> exec_addi cpu inst
   | { opcode = 0b0010011; funct3 = 0x1; _ } -> exec_slli cpu inst

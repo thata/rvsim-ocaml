@@ -8,7 +8,15 @@ let _add rd rs1 rs2 =
   and _f7 = 0b0000000 in
   Int32.of_int (_op lor _rd lor _f3 lor _rs1 lor _rs2 lor _f7)
 
-let print_int32 i = print_int (Int32.to_int i)
+let print_int32 x = print_int (Int32.to_int x)
+
+let print_int32_as_bits x len =
+  let nth_bit_str x n = Int32.to_string (Int32.logand (Int32.shift_right_logical x n) 1l) in
+  let rec f x n acc =
+    if n = 0 then acc ^ (nth_bit_str x n)
+    else f x (n - 1) (acc ^ (nth_bit_str x n))
+  in
+  print_string (String.sub (f x 31 "") (32 - len) len)
 
 (* 簡単な実行のテスト *)
 let test_run () =
@@ -89,7 +97,8 @@ let test_exec_sub () =
   (* x2 = 20 *)
   Array.set cpu.x_registers 3 (-10l);
   (* x3 = -10 *)
-  Rvsim.Cpu.exec_sub cpu 4 2 1; (* x4 = x2 - x1 *)
+  Rvsim.Cpu.exec_sub cpu 4 2 1;
+  (* x4 = x2 - x1 *)
   print_int32 (Array.get cpu.x_registers 4);
   (* => 10 *)
   print_newline ();
@@ -99,7 +108,17 @@ let test_exec_sub () =
   (* => 30 *)
   print_newline ()
 
+let test_exec_or () =
+  let cpu = Rvsim.Cpu.create in
+  Rvsim.Cpu.set_x_register cpu 1 0b1010l;
+  Rvsim.Cpu.set_x_register cpu 2 0b0101l;
+  Rvsim.Cpu.exec_or cpu 3 1 2;
+  print_int32_as_bits (Rvsim.Cpu.get_x_register cpu 3) 4;
+  (* => 1111 *)
+  print_newline ()
+
 let _ =
   test_run ();
   test_exec_add ();
-  test_exec_sub ()
+  test_exec_sub ();
+  test_exec_or ()
