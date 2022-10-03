@@ -34,25 +34,24 @@ let exec_or cpu rd rs1 rs2 =
   Array.set cpu.x_registers rd (Int32.of_int (v1 lor v2))
 
 (* AND命令 *)
-let exec_and cpu (inst : Instruction.t) =
-  let v1 = Int32.to_int (Array.get cpu.x_registers inst.rs1)
-  and v2 = Int32.to_int (Array.get cpu.x_registers inst.rs2) in
+let exec_and cpu rd rs1 rs2 =
+  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
+  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.of_int (v1 land v2))
+  Array.set cpu.x_registers rd (Int32.of_int (v1 land v2))
 
-let exec_addi cpu (inst : Instruction.t) =
-  let v1 = Array.get cpu.x_registers inst.rs1
-  (* TODO: i_imm の符号拡張が必要 *)
-  and imm = Int32.of_int inst.i_imm in
+let exec_addi cpu rd rs1 i_imm =
+  (* 12ビットの符号付き整数を32ビットに符号拡張 *)
+  let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
+  let v1 = Array.get cpu.x_registers rs1
+  and imm = Int32.of_int (sign_ext i_imm) in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.add v1 imm)
+  Array.set cpu.x_registers rd (Int32.add v1 imm)
 
-let exec_slli cpu (inst : Instruction.t) =
-  let v1 = Array.get cpu.x_registers inst.rs1
-  (* TODO: i_imm の符号拡張が必要 *)
-  and imm = inst.i_imm in
+let exec_slli cpu rd rs1 i_imm =
+  let v1 = Array.get cpu.x_registers rs1 and imm = i_imm in
   cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers inst.rd (Int32.shift_left v1 imm)
+  Array.set cpu.x_registers rd (Int32.shift_left v1 imm)
 
 let exec_beq _ _ = ()
 let exec_lw _ _ = ()
@@ -64,15 +63,18 @@ let fetch cpu =
 
 let exec cpu (inst : Instruction.t) =
   match inst with
-  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x00; rd; rs1; rs2; _ } ->
-      exec_add cpu rd rs1 rs2
-  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; rd; rs1; rs2; _ } ->
-      exec_sub cpu rd rs1 rs2
-  | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; rd; rs1; rs2; _ } ->
-      exec_or cpu rd rs1 rs2
-  | { opcode = 0b0110011; funct3 = 0x7; funct7 = 0x00; _ } -> exec_and cpu inst
-  | { opcode = 0b0010011; funct3 = 0x0; _ } -> exec_addi cpu inst
-  | { opcode = 0b0010011; funct3 = 0x1; _ } -> exec_slli cpu inst
+  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x00; _ } ->
+      exec_add cpu inst.rd inst.rs1 inst.rs2
+  | { opcode = 0b0110011; funct3 = 0x0; funct7 = 0x20; _ } ->
+      exec_sub cpu inst.rd inst.rs1 inst.rs2
+  | { opcode = 0b0110011; funct3 = 0x6; funct7 = 0x00; _ } ->
+      exec_or cpu inst.rd inst.rs1 inst.rs2
+  | { opcode = 0b0110011; funct3 = 0x7; funct7 = 0x00; _ } ->
+      exec_and cpu inst.rd inst.rs1 inst.rs2
+  | { opcode = 0b0010011; funct3 = 0x0; _ } ->
+      exec_addi cpu inst.rd inst.rs1 inst.i_imm
+  | { opcode = 0b0010011; funct3 = 0x1; _ } ->
+      exec_slli cpu inst.rd inst.rs1 inst.i_imm
   | { opcode = 0b1100011; funct3 = 0x0; _ } -> exec_beq cpu inst
   | { opcode = 0b0000011; funct3 = 0x2; _ } -> exec_lw cpu inst
   | { opcode = 0b0100011; funct3 = 0x2; _ } -> exec_sw cpu inst
