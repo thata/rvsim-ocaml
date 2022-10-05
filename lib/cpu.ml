@@ -53,14 +53,29 @@ let exec_slli cpu rd rs1 i_imm =
   cpu.pc <- Int32.add cpu.pc 4l;
   Array.set cpu.x_registers rd (Int32.shift_left v1 imm)
 
-let exec_beq (cpu:t) rs1 rs2 b_imm =
+let exec_beq cpu rs1 rs2 b_imm =
   let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
   and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
-  if v1 = v2 then cpu.pc <- Int32.add cpu.pc (Int32.of_int b_imm)
+  let sign_ext i = if i land 0x1000 = 0x1000 then 0xFFFFE000 lor i else i in
+  let imm = sign_ext b_imm in
+  if v1 = v2 then cpu.pc <- Int32.add cpu.pc (Int32.of_int imm)
   else cpu.pc <- Int32.add cpu.pc 4l
 
-let exec_lw _ _ = ()
-let exec_sw _ _ = ()
+let exec_lw cpu rd rs1 i_imm =
+  let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
+  let imm = sign_ext i_imm in
+  let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
+  let addr = rs1val + imm in
+  let v = Memory.read_word cpu.memory addr in
+  Array.set cpu.x_registers rd v
+
+let exec_sw cpu rs1 rs2 s_imm =
+  let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
+  let imm = sign_ext s_imm in
+  let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
+  let addr = rs1val + imm in
+  let rs2val = Array.get cpu.x_registers rs2 in
+  Memory.write_word cpu.memory addr rs2val
 
 let fetch cpu =
   let word = Memory.read_word cpu.memory (Int32.to_int cpu.pc) in
@@ -82,8 +97,10 @@ let exec cpu (inst : Instruction.t) =
       exec_slli cpu inst.rd inst.rs1 inst.i_imm
   | { opcode = 0b1100011; funct3 = 0x0; _ } ->
       exec_beq cpu inst.rs1 inst.rs2 inst.b_imm
-  | { opcode = 0b0000011; funct3 = 0x2; _ } -> exec_lw cpu inst
-  | { opcode = 0b0100011; funct3 = 0x2; _ } -> exec_sw cpu inst
+  | { opcode = 0b0000011; funct3 = 0x2; _ } ->
+      exec_lw cpu inst.rd inst.rs1 inst.i_imm
+  | { opcode = 0b0100011; funct3 = 0x2; _ } ->
+      exec_sw cpu inst.rs1 inst.rs2 inst.s_imm
   | _ -> failwith "invalid instruction"
 
 let run cpu = exec cpu (fetch cpu)
