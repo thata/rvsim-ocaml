@@ -53,7 +53,12 @@ let exec_slli cpu rd rs1 i_imm =
   cpu.pc <- Int32.add cpu.pc 4l;
   Array.set cpu.x_registers rd (Int32.shift_left v1 imm)
 
-let exec_beq _ _ = ()
+let exec_beq (cpu:t) rs1 rs2 b_imm =
+  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
+  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
+  if v1 = v2 then cpu.pc <- Int32.add cpu.pc (Int32.of_int b_imm)
+  else cpu.pc <- Int32.add cpu.pc 4l
+
 let exec_lw _ _ = ()
 let exec_sw _ _ = ()
 
@@ -75,7 +80,8 @@ let exec cpu (inst : Instruction.t) =
       exec_addi cpu inst.rd inst.rs1 inst.i_imm
   | { opcode = 0b0010011; funct3 = 0x1; _ } ->
       exec_slli cpu inst.rd inst.rs1 inst.i_imm
-  | { opcode = 0b1100011; funct3 = 0x0; _ } -> exec_beq cpu inst
+  | { opcode = 0b1100011; funct3 = 0x0; _ } ->
+      exec_beq cpu inst.rs1 inst.rs2 inst.b_imm
   | { opcode = 0b0000011; funct3 = 0x2; _ } -> exec_lw cpu inst
   | { opcode = 0b0100011; funct3 = 0x2; _ } -> exec_sw cpu inst
   | _ -> failwith "invalid instruction"

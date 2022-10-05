@@ -150,6 +150,30 @@ let test_exec_slli () =
   (* => 11100001111000011110000111100000 *)
   print_newline ()
 
+let test_exec_beq () =
+  let cpu = Rvsim.Cpu.create in
+  (* x1 = x2 の場合 *)
+  cpu.pc <- 0l;
+  Rvsim.Cpu.set_x_register cpu 1 1l;
+  Rvsim.Cpu.set_x_register cpu 2 1l;
+  Rvsim.Cpu.exec_beq cpu 1 2 12;
+  print_int32 cpu.pc;
+  print_newline ();
+  (* x1 != x2 の場合 *)
+  cpu.pc <- 0l;
+  Rvsim.Cpu.set_x_register cpu 1 1l;
+  Rvsim.Cpu.set_x_register cpu 2 2l;
+  Rvsim.Cpu.exec_beq cpu 1 2 12;
+  print_int32 cpu.pc;
+  print_newline ();
+  (* 負数の分岐 *)
+  cpu.pc <- 36l;
+  Rvsim.Cpu.set_x_register cpu 1 1l;
+  Rvsim.Cpu.set_x_register cpu 2 1l;
+  Rvsim.Cpu.exec_beq cpu 1 2 (-32);
+  print_int32 cpu.pc;
+  print_newline ()
+
 let _ =
   test_run ();
   test_exec_add ();
@@ -157,4 +181,5 @@ let _ =
   test_exec_and ();
   test_exec_or ();
   test_exec_addi ();
-  test_exec_slli ()
+  test_exec_slli ();
+  test_exec_beq ()
