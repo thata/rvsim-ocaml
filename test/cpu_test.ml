@@ -173,7 +173,7 @@ let test_exec_beq () =
   cpu.pc <- 4100l;
   Rvsim.Cpu.set_x_register cpu 1 1l;
   Rvsim.Cpu.set_x_register cpu 2 1l;
-  Rvsim.Cpu.exec_beq cpu 1 2 (0b1_0000_0000_0000);
+  Rvsim.Cpu.exec_beq cpu 1 2 0b1_0000_0000_0000;
   print_int32 cpu.pc;
   (* => 4 *)
   print_newline ()
