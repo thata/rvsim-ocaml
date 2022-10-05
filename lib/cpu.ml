@@ -16,29 +16,29 @@ let init_memory cpu data = Memory.init cpu.memory data
 let exec_add cpu rd rs1 rs2 =
   let v1 = Array.get cpu.x_registers rs1
   and v2 = Array.get cpu.x_registers rs2 in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.add v1 v2)
+  Array.set cpu.x_registers rd (Int32.add v1 v2);
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* SUB命令 *)
 let exec_sub cpu rd rs1 rs2 =
   let v1 = Array.get cpu.x_registers rs1
   and v2 = Array.get cpu.x_registers rs2 in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.sub v1 v2)
+  Array.set cpu.x_registers rd (Int32.sub v1 v2);
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* OR命令 *)
 let exec_or cpu rd rs1 rs2 =
   let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
   and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.of_int (v1 lor v2))
+  Array.set cpu.x_registers rd (Int32.of_int (v1 lor v2));
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* AND命令 *)
 let exec_and cpu rd rs1 rs2 =
   let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
   and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.of_int (v1 land v2))
+  Array.set cpu.x_registers rd (Int32.of_int (v1 land v2));
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* ADDI命令 *)
 let exec_addi cpu rd rs1 i_imm =
@@ -46,14 +46,14 @@ let exec_addi cpu rd rs1 i_imm =
   let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
   let v1 = Array.get cpu.x_registers rs1
   and imm = Int32.of_int (sign_ext i_imm) in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.add v1 imm)
+  Array.set cpu.x_registers rd (Int32.add v1 imm);
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* SLLI命令 *)
 let exec_slli cpu rd rs1 i_imm =
   let v1 = Array.get cpu.x_registers rs1 and imm = i_imm in
-  cpu.pc <- Int32.add cpu.pc 4l;
-  Array.set cpu.x_registers rd (Int32.shift_left v1 imm)
+  Array.set cpu.x_registers rd (Int32.shift_left v1 imm);
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* BEQ命令 *)
 let exec_beq cpu rs1 rs2 b_imm =
@@ -71,7 +71,8 @@ let exec_lw cpu rd rs1 i_imm =
   let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
   let addr = rs1val + imm in
   let v = Memory.read_word cpu.memory addr in
-  Array.set cpu.x_registers rd v
+  Array.set cpu.x_registers rd v;
+  cpu.pc <- Int32.add cpu.pc 4l
 
 (* SW命令 *)
 let exec_sw cpu rs1 rs2 s_imm =
@@ -80,7 +81,8 @@ let exec_sw cpu rs1 rs2 s_imm =
   let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
   let addr = rs1val + imm in
   let rs2val = Array.get cpu.x_registers rs2 in
-  Memory.write_word cpu.memory addr rs2val
+  Memory.write_word cpu.memory addr rs2val;
+  cpu.pc <- Int32.add cpu.pc 4l
 
 let fetch cpu =
   let word = Memory.read_word cpu.memory (Int32.to_int cpu.pc) in
