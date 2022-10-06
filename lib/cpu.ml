@@ -14,73 +14,76 @@ let init_memory cpu data = Memory.init cpu.memory data
 
 (* ADD命令 *)
 let exec_add cpu rd rs1 rs2 =
-  let v1 = Array.get cpu.x_registers rs1
-  and v2 = Array.get cpu.x_registers rs2 in
-  Array.set cpu.x_registers rd (Int32.add v1 v2);
+  let rs1v = Array.get cpu.x_registers rs1
+  and rs2v = Array.get cpu.x_registers rs2 in
+  Array.set cpu.x_registers rd (Int32.add rs1v rs2v);
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* SUB命令 *)
 let exec_sub cpu rd rs1 rs2 =
-  let v1 = Array.get cpu.x_registers rs1
-  and v2 = Array.get cpu.x_registers rs2 in
-  Array.set cpu.x_registers rd (Int32.sub v1 v2);
+  let rs1v = Array.get cpu.x_registers rs1
+  and rs2v = Array.get cpu.x_registers rs2 in
+  Array.set cpu.x_registers rd (Int32.sub rs1v rs2v);
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* OR命令 *)
 let exec_or cpu rd rs1 rs2 =
-  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
-  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
-  Array.set cpu.x_registers rd (Int32.of_int (v1 lor v2));
+  let rs1v = Int32.to_int (Array.get cpu.x_registers rs1)
+  and rs2v = Int32.to_int (Array.get cpu.x_registers rs2) in
+  Array.set cpu.x_registers rd (Int32.of_int (rs1v lor rs2v));
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* AND命令 *)
 let exec_and cpu rd rs1 rs2 =
-  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
-  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
-  Array.set cpu.x_registers rd (Int32.of_int (v1 land v2));
+  let rs1v = Int32.to_int (Array.get cpu.x_registers rs1)
+  and rs2v = Int32.to_int (Array.get cpu.x_registers rs2) in
+  Array.set cpu.x_registers rd (Int32.of_int (rs1v land rs2v));
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* ADDI命令 *)
 let exec_addi cpu rd rs1 i_imm =
-  (* 12ビットの符号付き整数を32ビットに符号拡張 *)
+  (* 12ビット符号付き整数を32ビットに符号拡張 *)
   let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
-  let v1 = Array.get cpu.x_registers rs1
+  let rs1v = Array.get cpu.x_registers rs1
   and imm = Int32.of_int (sign_ext i_imm) in
-  Array.set cpu.x_registers rd (Int32.add v1 imm);
+  Array.set cpu.x_registers rd (Int32.add rs1v imm);
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* SLLI命令 *)
 let exec_slli cpu rd rs1 i_imm =
-  let v1 = Array.get cpu.x_registers rs1 and imm = i_imm in
-  Array.set cpu.x_registers rd (Int32.shift_left v1 imm);
+  let rs1v = Array.get cpu.x_registers rs1 in
+  Array.set cpu.x_registers rd (Int32.shift_left rs1v i_imm);
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* BEQ命令 *)
 let exec_beq cpu rs1 rs2 b_imm =
-  let v1 = Int32.to_int (Array.get cpu.x_registers rs1)
-  and v2 = Int32.to_int (Array.get cpu.x_registers rs2) in
+  (* 13ビット符号付き整数を32ビットに符号拡張 *)
   let sign_ext i = if i land 0x1000 = 0x1000 then 0xFFFFE000 lor i else i in
+  let rs1v = Int32.to_int (Array.get cpu.x_registers rs1)
+  and rs2v = Int32.to_int (Array.get cpu.x_registers rs2) in
   let imm = sign_ext b_imm in
-  if v1 = v2 then cpu.pc <- Int32.add cpu.pc (Int32.of_int imm)
+  if rs1v = rs2v then cpu.pc <- Int32.add cpu.pc (Int32.of_int imm)
   else cpu.pc <- Int32.add cpu.pc 4l
 
 (* LW命令 *)
 let exec_lw cpu rd rs1 i_imm =
+  (* 12ビット符号付き整数を32ビットに符号拡張 *)
   let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
-  let imm = sign_ext i_imm in
   let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
+  let imm = sign_ext i_imm in
   let addr = rs1val + imm in
-  let v = Memory.read_word cpu.memory addr in
-  Array.set cpu.x_registers rd v;
+  let data = Memory.read_word cpu.memory addr in
+  Array.set cpu.x_registers rd data;
   cpu.pc <- Int32.add cpu.pc 4l
 
 (* SW命令 *)
 let exec_sw cpu rs1 rs2 s_imm =
+  (* 12ビット符号付き整数を32ビットに符号拡張 *)
   let sign_ext i = if i land 0x800 = 0x800 then 0xFFFFF000 lor i else i in
-  let imm = sign_ext s_imm in
   let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
-  let addr = rs1val + imm in
   let rs2val = Array.get cpu.x_registers rs2 in
+  let imm = sign_ext s_imm in
+  let addr = rs1val + imm in
   Memory.write_word cpu.memory addr rs2val;
   cpu.pc <- Int32.add cpu.pc 4l
 
