@@ -1,7 +1,17 @@
-type t = { mutable pc : int32; memory : Memory.t; x_registers : int32 array }
+type t = {
+  mutable pc : int32;
+  memory : Memory.t;
+  x_registers : int32 array;
+  mutable nop_count : int;
+}
 
 let create =
-  { pc = 0l; memory = Memory.make 512 '\x00'; x_registers = Array.make 32 0l }
+  {
+    pc = 0l;
+    memory = Memory.make 512 '\x00';
+    x_registers = Array.make 32 0l;
+    nop_count = 0;
+  }
 
 (* レジスタの値を取得する *)
 (* x0は常に0を返す *)
@@ -89,7 +99,10 @@ let exec_sw cpu rs1 rs2 s_imm =
 
 let fetch cpu =
   let word = Memory.read_word cpu.memory (Int32.to_int cpu.pc) in
-  Instruction.decode word
+  let inst = Instruction.decode word in
+  (* NOPの場合はnop_countをインクリメント *)
+  if Instruction.is_nop inst then cpu.nop_count <- cpu.nop_count + 1;
+  inst
 
 let exec cpu (inst : Instruction.t) =
   match inst with
@@ -113,4 +126,10 @@ let exec cpu (inst : Instruction.t) =
       exec_sw cpu inst.rs1 inst.rs2 inst.s_imm
   | _ -> failwith "invalid instruction"
 
-let run cpu = exec cpu (fetch cpu)
+let run cpu =
+  let inst = fetch cpu in
+  (* NOPが5回来たら実行を終了するためにfalseを返す *)
+  if cpu.nop_count >= 5 then false
+  else (
+    exec cpu inst;
+    true)

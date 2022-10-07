@@ -58,9 +58,9 @@ let test_run () =
   (* => 0 *)
   print_newline ();
   (* 1つめの命令を実行 *)
-  Rvsim.Cpu.run cpu;
+  ignore (Rvsim.Cpu.run cpu);
   (* 2つめの命令を実行 *)
-  Rvsim.Cpu.run cpu;
+  ignore (Rvsim.Cpu.run cpu);
   (* 実行後 *)
   print_int32 cpu.pc;
   (* => 8 *)

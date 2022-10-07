@@ -28,6 +28,12 @@ let decode word =
   in
   { opcode; rd; funct3; rs1; rs2; funct7; i_imm; s_imm; b_imm }
 
+(* NOPか否かを返す *)
+let is_nop inst =
+  match inst with
+  | { opcode = 0b0010011; funct3 = 0; rd = 0; rs1 = 0; i_imm = 0; _ } -> true
+  | _ -> false
+
 (* ADD命令 *)
 let add rd rs1 rs2 =
   let _op = 0b0110011

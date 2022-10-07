@@ -11,9 +11,11 @@ let init_with_file sim f =
   Cpu.init_memory sim.cpu (Buffer.to_bytes b)
 
 let start (sim : t) =
-  Cpu.run sim.cpu;
-  Cpu.run sim.cpu;
-  Cpu.run sim.cpu
+  (* NOP5回で終了するまでループし続ける *)
+  while Cpu.run sim.cpu do
+    (* NOTE: 空文の書き方が分からない... *)
+    ignore ()
+  done
 
 let dump_register label i32 =
   let i = Int32.to_int i32 in
@@ -21,7 +23,8 @@ let dump_register label i32 =
 
 let dump_registers (sim : t) =
   let cpu = sim.cpu in
-  print_endline "--------------------------------------------------------------------------------";
+  print_endline
+    "--------------------------------------------------------------------------------";
   for i = 0 to 7 do
     for j = 0 to 3 do
       let n = (i * 4) + j in
@@ -32,6 +35,7 @@ let dump_registers (sim : t) =
     done;
     print_newline ()
   done;
-  print_endline "--------------------------------------------------------------------------------";
+  print_endline
+    "--------------------------------------------------------------------------------";
   dump_register "pc" cpu.pc;
   print_newline ()
