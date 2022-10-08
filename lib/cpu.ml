@@ -82,7 +82,11 @@ let exec_lw cpu rd rs1 i_imm =
   let rs1val = Int32.to_int (Array.get cpu.x_registers rs1) in
   let imm = sign_ext i_imm in
   let addr = rs1val + imm in
-  let data = Memory.read_word cpu.memory addr in
+  let data =
+    (* 読み込み元のアドレスが 0x10000000 の場合は標準入力からデータを読み込む *)
+    if addr = 0x10000000 then Int32.of_int (input_byte stdin)
+    else Memory.read_word cpu.memory addr
+  in
   Array.set cpu.x_registers rd data;
   cpu.pc <- Int32.add cpu.pc 4l
 
@@ -94,7 +98,10 @@ let exec_sw cpu rs1 rs2 s_imm =
   let rs2val = Array.get cpu.x_registers rs2 in
   let imm = sign_ext s_imm in
   let addr = rs1val + imm in
-  if addr = 0x10000000 then print_char (Char.chr (Int32.to_int rs2val))
+  (* 書き込み先のアドレスが 0x10000000 の場合は標準出力へデータを出力する *)
+  if addr = 0x10000000 then (
+    print_char (Char.chr (Int32.to_int rs2val));
+    flush stdout)
   else Memory.write_word cpu.memory addr rs2val;
   cpu.pc <- Int32.add cpu.pc 4l
 
