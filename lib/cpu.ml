@@ -94,7 +94,8 @@ let exec_sw cpu rs1 rs2 s_imm =
   let rs2val = Array.get cpu.x_registers rs2 in
   let imm = sign_ext s_imm in
   let addr = rs1val + imm in
-  Memory.write_word cpu.memory addr rs2val;
+  if addr = 0x10000000 then print_char (Char.chr (Int32.to_int rs2val))
+  else Memory.write_word cpu.memory addr rs2val;
   cpu.pc <- Int32.add cpu.pc 4l
 
 let fetch cpu =
