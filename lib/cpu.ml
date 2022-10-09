@@ -20,7 +20,10 @@ let get_x_register cpu n = if n = 0 then 0l else Array.get cpu.x_registers n
 (* 指定したレジスタに値をセットする *)
 (* x0への値のセットは無視される *)
 let set_x_register cpu n v = if n = 0 then () else Array.set cpu.x_registers n v
+
 let init_memory cpu data = Memory.init cpu.memory data
+
+let is_serial_io addr = addr = 0x10000000
 
 (* ADD命令 *)
 let exec_add cpu rd rs1 rs2 =
@@ -83,8 +86,7 @@ let exec_lw cpu rd rs1 i_imm =
   let imm = sign_ext i_imm in
   let addr = rs1val + imm in
   let data =
-    (* 読み込み元のアドレスが 0x10000000 の場合は標準入力からデータを読み込む *)
-    if addr = 0x10000000 then Int32.of_int (input_byte stdin)
+    if is_serial_io addr then Serial.read ()
     else Memory.read_word cpu.memory addr
   in
   Array.set cpu.x_registers rd data;
@@ -98,10 +100,7 @@ let exec_sw cpu rs1 rs2 s_imm =
   let rs2val = Array.get cpu.x_registers rs2 in
   let imm = sign_ext s_imm in
   let addr = rs1val + imm in
-  (* 書き込み先のアドレスが 0x10000000 の場合は標準出力へデータを出力する *)
-  if addr = 0x10000000 then (
-    print_char (Char.chr (Int32.to_int rs2val));
-    flush stdout)
+  if is_serial_io addr then Serial.write rs2val
   else Memory.write_word cpu.memory addr rs2val;
   cpu.pc <- Int32.add cpu.pc 4l
 
