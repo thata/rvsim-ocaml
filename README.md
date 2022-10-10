@@ -1,5 +1,7 @@
 # RISC-V simulator written in OCaml
 
+<img width="682" alt="image" src="https://user-images.githubusercontent.com/15457/194853471-938b0105-579a-41c7-81b8-e8a103710179.png">
+
 ## Usage
 
 ```sh
