@@ -43,4 +43,38 @@ This software is released under the MIT License, see LICENSE.
   - slli (Shift Left Logical Immediate)
   - lw (Load Word)
   - sw (Store Word)
-  
+
+## How to build .rom file
+
+```sh
+# Pull Docker image
+$ docker pull kamiyaowl/riscv-gnu-toolchain-docker
+
+# Build
+$ cd ~/src/rvsim-ocaml/sample/
+$ docker run --rm \
+  -v $PWD:/usr/src/myapp \
+  -w /usr/src/myapp kamiyaowl/riscv-gnu-toolchain-docker \
+  /opt/riscv/bin/riscv32-unknown-elf-gcc \
+  -march=rv32i -mabi=ilp32 -Wl,-Ttext=0x00 -nostdlib -o hello.elf hello.S
+$ docker run --rm \
+  -v $PWD:/usr/src/myapp \
+  -w /usr/src/myapp kamiyaowl/riscv-gnu-toolchain-docker \
+  /opt/riscv/bin/riscv32-unknown-elf-objcopy -O binary hello.elf hello.rom
+
+# Run
+$ cd ..
+$ dune exec rvsim sample/hello.rom
+HELLO WORLD!!
+--------------------------------------------------------------------------------
+x00 = 0x0 (0)	x01 = 0x0 (0)	x02 = 0x0 (0)	x03 = 0x10000000 (268435456)
+x04 = 0x0 (0)	x05 = 0xa (10)	x06 = 0x0 (0)	x07 = 0x0 (0)
+x08 = 0x0 (0)	x09 = 0x0 (0)	x10 = 0x0 (0)	x11 = 0x0 (0)
+x12 = 0x0 (0)	x13 = 0x0 (0)	x14 = 0x0 (0)	x15 = 0x0 (0)
+x16 = 0x0 (0)	x17 = 0x0 (0)	x18 = 0x0 (0)	x19 = 0x0 (0)
+x20 = 0x0 (0)	x21 = 0x0 (0)	x22 = 0x0 (0)	x23 = 0x0 (0)
+x24 = 0x0 (0)	x25 = 0x0 (0)	x26 = 0x0 (0)	x27 = 0x0 (0)
+x28 = 0x0 (0)	x29 = 0x0 (0)	x30 = 0x0 (0)	x31 = 0x0 (0)
+--------------------------------------------------------------------------------
+pc = 0x88 (136)
+```
