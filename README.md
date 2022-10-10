@@ -21,6 +21,14 @@ pc = 0x88 (136)
 $
 ```
 
+Run tests
+
+```sh
+$ dune test && echo ok
+ok
+$
+```
+
 ## License
 This software is released under the MIT License, see LICENSE.
 
