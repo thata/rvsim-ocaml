@@ -31,6 +31,9 @@ ok
 $
 ```
 
+## How to make a RISC-V simulator in OCaml
+https://scrapbox.io/htkymtks/OCaml%E3%81%A7%E3%82%82%E3%81%A7%E3%81%8D%E3%82%8BRISC-V%E3%82%B7%E3%83%9F%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%BF%E3%81%AE%E4%BD%9C%E3%82%8A%E6%96%B9
+
 ## License
 This software is released under the MIT License, see LICENSE.
 
